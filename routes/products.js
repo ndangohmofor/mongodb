@@ -69,18 +69,20 @@ router.get("/", (req, res, next) => {
   // }
   MongoClient.connect("mongodb://mongodb:27017/shop")
     .then((client) => {
+      const products = [];
       client
         .db()
         .collection("products")
         .find()
         .forEach((productDoc) => {
-          console.log(productDoc);
-          return productDoc;
+          productDoc.price = productDoc.price
+            ? productDoc?.price.toString()
+            : 10.99;
+          products.push(productDoc);
         })
         .then((result) => {
-          console.log(result);
           client.close();
-          res.status(200).json([]);
+          res.status(200).json(products);
         })
         .catch((err) => {
           console.log(err);
