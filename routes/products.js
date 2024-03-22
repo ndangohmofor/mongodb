@@ -1,8 +1,9 @@
 const Router = require("express").Router;
 const mongodb = require("mongodb");
+const db = require("../db");
 
 const router = Router();
-const MongoClient = mongodb.MongoClient;
+
 const Decimal128 = mongodb.Decimal128;
 
 const products = [
@@ -67,28 +68,17 @@ router.get("/", (req, res, next) => {
   //     queryPage * pageSize
   //   );
   // }
-  MongoClient.connect("mongodb://mongodb:27017/shop")
-    .then((client) => {
-      const products = [];
-      client
-        .db()
-        .collection("products")
-        .find()
-        .forEach((productDoc) => {
-          productDoc.price = productDoc.price
-            ? productDoc?.price.toString()
-            : 10.99;
-          products.push(productDoc);
-        })
-        .then((result) => {
-          client.close();
-          res.status(200).json(products);
-        })
-        .catch((err) => {
-          console.log(err);
-          client.close();
-          res.status(500).json({ message: "An error occurred" });
-        });
+  db.getDb()
+    .collection("products")
+    .find()
+    .forEach((productDoc) => {
+      productDoc.price = productDoc.price
+        ? productDoc?.price.toString()
+        : 10.99;
+      products.push(productDoc);
+    })
+    .then((result) => {
+      res.status(200).json(products);
     })
     .catch((err) => {
       console.log(err);
@@ -111,27 +101,19 @@ router.post("", (req, res, next) => {
     price: Decimal128.fromString(req.body.price.toString()), // store this as 128bit decimal in MongoDB
     image: req.body.image,
   };
-  MongoClient.connect("mongodb://mongodb:27017/shop")
-    .then((client) => {
-      client
-        .db()
-        .collection("products")
-        .insertOne(newProduct)
-        .then((result) => {
-          console.log(result);
-          client.close();
-          res
-            .status(201)
-            .json({ message: "Product added", productId: result.insertedId });
-        })
-        .catch((err) => {
-          console.log(err);
-          client.close();
-          res.status(500).json({ message: "An error occurred" });
-        });
+  db.getDb()
+    .collection("products")
+    .insertOne(newProduct)
+    .then((result) => {
+      console.log(result);
+
+      res
+        .status(201)
+        .json({ message: "Product added", productId: result.insertedId });
     })
     .catch((err) => {
       console.log(err);
+
       res.status(500).json({ message: "An error occurred" });
     });
 });
