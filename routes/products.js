@@ -68,6 +68,7 @@ router.get("/", (req, res, next) => {
   //     queryPage * pageSize
   //   );
   // }
+  const products = [];
   db.getDb()
     .collection("products")
     .find()
