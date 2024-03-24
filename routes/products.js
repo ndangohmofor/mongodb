@@ -60,8 +60,8 @@ const ObjectId = mongodb.ObjectId;
 router.get("/", (req, res, next) => {
   // Return a list of dummy products
   // Later, this data will be fetched from MongoDB
-  // const queryPage = req.query.page;
-  // const pageSize = 5;
+  const queryPage = req.query.page;
+  const pageSize = 1;
   // let resultProducts = [...products];
   // if (queryPage) {
   //   resultProducts = products.slice(
@@ -74,6 +74,9 @@ router.get("/", (req, res, next) => {
     .db()
     .collection("products")
     .find()
+    .sort({ price: -1 })
+    .skip((queryPage - 1) * pageSize)
+    .limit(pageSize)
     .forEach((productDoc) => {
       productDoc.price = productDoc.price
         ? productDoc?.price.toString()
