@@ -141,10 +141,7 @@ router.patch("/:id", (req, res, next) => {
   db.getDb()
     .db()
     .collection("products")
-    .updateOne(
-      { _id: new ObjectId(req.params.id) },
-      { $set: { updatedProduct } }
-    )
+    .updateOne({ _id: new ObjectId(req.params.id) }, { $set: updatedProduct })
     .then((result) => {
       res
         .status(201)
@@ -154,7 +151,7 @@ router.patch("/:id", (req, res, next) => {
       console.log(err);
       res.status(500).json({ message: "An error occurred" });
     });
-  res.status(200).json({ message: "Product updated", productId: "DUMMY" });
+  // res.status(200).json({ message: "Product updated", productId: "DUMMY" });
 });
 
 // Delete a product
